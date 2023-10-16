@@ -1,0 +1,58 @@
+# Preprocessing
+
+def minmax(spec):
+    '''
+    Min-max normalization
+    Parameters
+    ----------
+    spec : ndarray
+        Spectra of shape [n_spectra, n_points].
+    Returns
+    -------
+    spec : ndarray
+        Normalized spectra of same shape.
+    '''
+    
+    spec = np.divide(
+        spec - np.min(spec, axis=1)[:,None],
+        (np.max(spec, axis=1) - np.min(spec, axis=1))[:,None]
+        )
+    
+    print('Min-max normalization applied.')
+    
+    return spec 
+
+    # Normalization (b)
+
+
+def meancenter(spec, orientation):
+    if orientation == 'rows':#columns
+        spec = spec - np.mean(spec, axis=1)[:,None]
+        print('Mean centered (columns).')#rows
+        
+    elif orientation == 'row':#column
+        spec = spec - np.mean(spec, axis=0)[None,:]
+        print('Mean centered (rows).')#columns
+        
+    else:
+        print('Invalid orientation! \nSelect "row" or "column" orientation.')
+
+        return spec
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Base-line Correction
+
+degree = 2
+d = np.linspace(-1, 1, np.shape(spec)[1]).reshape(-1,1)
+# d = np.repeat(d,degree+1,axis=1)**np.arange(0,degree+1)
+    
+
+
+model = np.hstack((
+            np.mean(spec, axis=0).reshape(-1,1), d))
+    
+    # Least Squares estimation
+params = np.linalg.lstsq(model, spec.T, rcond=None)[0]
+    
+    # Baseline correction (a, d1, d2, ..., dn)
+spec= spec - model[:,1:].dot(params[1:,:]).T
+
