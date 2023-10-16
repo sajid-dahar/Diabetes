@@ -1,0 +1,49 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Perform PCA to reduce dimensionality to 1D
+pca = PCA(n_components=3)
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+
+# Perform LDA on the reduced PCA data to further reduce it to 1D
+lda = LinearDiscriminantAnalysis(n_components=1)
+X_train_lda = lda.fit_transform(X_train_pca, y_train)
+X_test_lda = lda.transform(X_test_pca)
+
+# Train a simple classification model (e.g., Logistic Regression)
+model = LogisticRegression()
+model.fit(X_train_lda, y_train)
+
+# Make predictions on the test set
+y_pred = model.predict(X_test_lda)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+# Calculate discriminant function values
+# discriminant_values = model.decision_function(X_test_lda)
+discriminant_values = model.decision_function(X_train_lda)
+
+# Create a scatter plot to visualize discriminant values along the y-axis and sample numbers along the x-axis
+plt.figure(figsize=(10, 5))
+# plt.scatter(range(len(y_test)), discriminant_values, c=y_test, cmap='coolwarm', marker='o', label='Samples')
+plt.scatter(range(len(y_train)), discriminant_values, c=y_train, cmap='coolwarm', marker='o', label='Samples')
+plt.axhline(0, color='black', linestyle='--', label='Decision Boundary')
+plt.xlabel('Sample Number')
+plt.ylabel('Discriminant Function')
+plt.title('Discriminant Function along Y-axis vs. Sample Numbers along X-axis')
+plt.legend(loc='best')
+plt.show()
+
+print(f'Accuracy: {accuracy:.2f}')
