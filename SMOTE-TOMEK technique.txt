@@ -1,0 +1,20 @@
+# Standard Scaler
+
+from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
+
+le = preprocessing.LabelEncoder()
+yc = le.fit_transform(label3)
+Y =yc
+
+sc = StandardScaler()
+X = sc.fit_transform(spec)
+
+%---------------------------------------------%
+
+#Smote-Tomke Technique
+from imblearn.combine import SMOTETomek
+from imblearn.over_sampling import SMOTE
+
+smt = SMOTETomek (tomek = TomekLinks(sampling_strategy='majority'))
+X, y = smt.fit_resample(X, Y)
